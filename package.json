@@ -3,5 +3,11 @@
   "packageManager": "yarn@4.9.1",
   "dependencies": {
     "@strapi/provider-upload-aws-s3": "^5.12.5"
+  },
+  "scripts": {
+    "develop": "strapi develop",
+    "start": "strapi start",
+    "build": "strapi build",
+    "strapi": "strapi"
   }
 }
