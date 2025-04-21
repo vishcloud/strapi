@@ -16,6 +16,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Setup Terraform  # Add this step to install Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.0.0
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -27,7 +32,7 @@ jobs:
         run: terraform init
 
       - name: Terraform Plan
-        run: terraform plan -var="image_tag=${{ github.event.inputs.image_tag }}" -var="ecr_registry=${{ secrets.ECR_REGISTRY }}" -var="image_name=strapi-appp-vishal"
+        run: terraform plan -var="image_tag=${{ github.event.inputs.image_tag }}" -var="ecr_registry=${{ secrets.ECR_REGISTRY }}"
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -var="image_tag=${{ github.event.inputs.image_tag }}" -var="ecr_registry=${{ secrets.ECR_REGISTRY }}" -var="image_name=strapi-appp-vishal"
