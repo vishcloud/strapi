@@ -1,0 +1,8 @@
+ecr_registry = "118273046134.dkr.ecr.us-east-1.amazonaws.com"
+image_name   = "strapi-appp-vishal"
+image_tag    = "2025-04-21-14-53-56"
+aws_region = "us-east-1"
+instance_type = "t2.medium"
+ssh_key_name = "strapi-ec2-key"
+vpc_id = "vpc-06d8d62f289ef46d0"
+subnet_id = "subnet-0b672b5fc47ae0c83"
