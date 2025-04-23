@@ -103,7 +103,7 @@ resource "aws_instance" "vishal_strapi_server" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.instance_type
   key_name               = var.ssh_key_name
-  vpc_security_group_ids = [aws_security_group.vishal_strapi_sg.id]
+  vpc_security_group_ids = [aws_security_group.vishal_strapi_sg.id.]
   subnet_id              = var.subnet_id
 
   root_block_device {
@@ -116,20 +116,52 @@ resource "aws_instance" "vishal_strapi_server" {
 
   user_data = <<-EOF
               #!/bin/bash
-              # Install Docker if not installed
-              if ! command -v docker &> /dev/null; then
-                apt-get update
-                apt-get install -y docker.io
-                systemctl start docker
-                systemctl enable docker
-              fi
-
-              # Login to AWS ECR
-              aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${var.ecr_registry}
-
-              # Pull and run the Docker container
-              docker pull ${var.ecr_registry}/${var.image_name}:${var.image_tag}
-              docker run -d -p 1337:1337 ${var.ecr_registry}/${var.image_name}:${var.image_tag}
+              exec > >(tee /var/log/user-data.log) 2>&1
+              
+              # Update system
+              apt-get update -y
+              
+              # Install required packages
+              apt-get install -y \
+                  unzip \
+                  apt-transport-https \
+                  ca-certificates \
+                  curl \
+                  gnupg \
+                  lsb-release
+              
+              # Install Docker
+              curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+              echo \
+                "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+                $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+              apt-get update -y
+              apt-get install -y docker-ce docker-ce-cli containerd.io
+              
+              # Install AWS CLI
+              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+              unzip awscliv2.zip
+              ./aws/install
+              
+              # Configure Docker permissions
+              usermod -aG docker ubuntu
+              systemctl enable docker
+              systemctl start docker
+              
+              # Login to ECR
+              aws ecr get-login-password --region us-east-1 | \
+              docker login --username AWS --password-stdin ${var.ecr_registry}
+              
+              # Run container with restart policy
+              docker run -d \
+                --restart unless-stopped \
+                -p 1337:1337 \
+                --name strapi \
+                ${var.ecr_registry}/${var.image_name}:${var.image_tag}
+              
+              # Verify container status
+              sleep 10
+              docker ps --filter "name=strapi"
               EOF
 
   tags = {
