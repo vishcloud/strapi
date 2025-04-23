@@ -103,7 +103,7 @@ resource "aws_instance" "vishal_strapi_server" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.instance_type
   key_name               = var.ssh_key_name
-  vpc_security_group_ids = [aws_security_group.vishal_strapi_sg.id.]
+  vpc_security_group_ids = [aws_security_group.vishal_strapi_sg.id]
   subnet_id              = var.subnet_id
 
   root_block_device {
