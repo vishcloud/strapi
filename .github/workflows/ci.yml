@@ -3,6 +3,7 @@ name: Build and Push to ECR
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -33,3 +34,4 @@ jobs:
         run: |
           docker build -t ${{ secrets.ECR_REGISTRY }}/strapi-appp-vishal:${{ steps.tag.outputs.tag }} .
           docker push ${{ secrets.ECR_REGISTRY }}/strapi-appp-vishal:${{ steps.tag.outputs.tag }}
+
