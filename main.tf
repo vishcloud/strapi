@@ -32,8 +32,8 @@ variable "ssh_key_name" {
 }
 
 # Security group for Strapi EC2 instance
-resource "aws_security_group" "vishal_strapi_sg" {
-  name        = "vishal-strapi-security-group"
+resource "aws_security_group" "vishalp_strapi_sg" {
+  name        = "vishalp-strapi-security-group"
   description = "Security group for Strapi application"
   vpc_id      = var.vpc_id
 
@@ -103,7 +103,7 @@ resource "aws_instance" "vishal_strapi_server" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.instance_type
   key_name               = var.ssh_key_name
-  vpc_security_group_ids = [aws_security_group.vishal_strapi_sg.id]
+  vpc_security_group_ids = [aws_security_group.vishalp_strapi_sg.id]
   subnet_id              = var.subnet_id
 
   root_block_device {
@@ -168,5 +168,5 @@ resource "aws_instance" "vishal_strapi_server" {
     Name = "vishal_strapi_server"
   }
 
-  depends_on = [aws_security_group.vishal_strapi_sg]
+  depends_on = [aws_security_group.vishalp_strapi_sg]
 }
